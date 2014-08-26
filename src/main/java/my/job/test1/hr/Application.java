@@ -1,9 +1,6 @@
 package my.job.test1.hr;
 
-import my.job.test1.hr.application.GenerateData;
-import my.job.test1.hr.application.ICommand;
-import my.job.test1.hr.application.MigrateRollback;
-import my.job.test1.hr.application.MigrateUpdate;
+import my.job.test1.hr.application.*;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.*;
 import org.aeonbits.owner.ConfigCache;
@@ -53,6 +50,20 @@ public class Application {
                 .addParser("generate-data")
                 .help("Fills database with generated random data, assumes all migrations are applied")
                 .setDefault("command", new GenerateData());
+
+        Subparser parserQueryByRegionAndHistorySize = subparsers
+                .addParser("query-rh")
+                .help("Queries database for employees from specific regions and who have certain number of job transitions")
+                .setDefault("command", new QueryByRegionAndHistorySize());
+        parserQueryByRegionAndHistorySize
+                .addArgument("--regions")
+                .type(String.class)
+                .nargs("+")
+                .setDefault(new String[] { "AMERICA", "EUROPE" });
+        parserQueryByRegionAndHistorySize
+                .addArgument("--jobs")
+                .type(Integer.class)
+                .setDefault(2);
 
         try {
             Namespace ns = parser.parseArgs(args);

@@ -132,7 +132,7 @@ public class GenerateData implements ICommand {
 
     void createEmploymentHistory(int departmentId, int employeeId) throws Exception {
         int jobsCount = random.nextInt(5) + 1;
-        Timestamp startDate = new Timestamp(hireDateFrom);
+        Timestamp startDate = new Timestamp(hireDateFrom + (long) (Math.random() * (hireDateTo - hireDateFrom)) / 2);
         Timestamp endDate;
         for (int i = 0; i < jobsCount; i++) {
             endDate = new Timestamp(startDate.getTime() + (long) (Math.random() * (hireDateTo - hireDateFrom)));
@@ -145,6 +145,15 @@ public class GenerateData implements ICommand {
             );
             employeesDAO.jobEnd(employeeId, endDate);
             startDate = endDate;
+        }
+        if (random.nextBoolean()) {
+            int jobI = random.nextInt(10);
+            int jobId = jobsIds[jobI];
+            employeesDAO.jobStart(
+                    departmentId, employeeId, jobId, startDate,
+                    new BigDecimal(100 * jobI + 1000 + random.nextInt(1000)),
+                    new BigDecimal(10 + 10 * Math.random())
+            );
         }
     }
 
