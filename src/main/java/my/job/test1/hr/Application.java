@@ -1,11 +1,13 @@
 package my.job.test1.hr;
 
+import my.job.test1.hr.application.GenerateData;
 import my.job.test1.hr.application.ICommand;
 import my.job.test1.hr.application.MigrateRollback;
 import my.job.test1.hr.application.MigrateUpdate;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.*;
 import org.aeonbits.owner.ConfigCache;
+import org.sql2o.Sql2o;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,6 +22,10 @@ public class Application {
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(getConfig().jdbcUrl(), getConfig().jdbcUsername(), getConfig().jdbcPassword());
+    }
+
+    public static Sql2o getSql2o() {
+        return new Sql2o(getConfig().jdbcUrl(), getConfig().jdbcUsername(), getConfig().jdbcPassword());
     }
 
     public static void main(String[] args) throws Exception {
@@ -42,6 +48,11 @@ public class Application {
                 .addParser("migrate-rollback")
                 .help("Rollback all applied migrations, using Liquibase")
                 .setDefault("command", new MigrateRollback());
+
+        Subparser parserGenerateData = subparsers
+                .addParser("generate-data")
+                .help("Fills database with generated random data, assumes all migrations are applied")
+                .setDefault("command", new GenerateData());
 
         try {
             Namespace ns = parser.parseArgs(args);
