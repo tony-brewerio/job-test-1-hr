@@ -95,6 +95,21 @@ public class Application {
                 .type(Arguments.fileType().verifyCanCreate())
                 .required(true);
 
+        Subparser parserEmployeeManagers = subparsers
+                .addParser("employee-managers")
+                .help("Displays management hierarchy for given employees")
+                .setDefault("command", new EmployeeManagers());
+        parserEmployeeManagers
+                .addArgument("id")
+                .help("IDs of the employees")
+                .nargs("+")
+                .type(Integer.class)
+                .required(true);
+        parserEmployeeManagers
+                .addArgument("--reverse")
+                .help("If reverse is set, display managers top to bottom")
+                .action(Arguments.storeTrue());
+
         try {
             Namespace ns = parser.parseArgs(args);
             ICommand command = ns.get("command");
