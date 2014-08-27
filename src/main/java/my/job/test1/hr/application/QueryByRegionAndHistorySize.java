@@ -29,7 +29,7 @@ public class QueryByRegionAndHistorySize implements ICommand {
         }
         sql = sql.replace("?regions?", inClause);
 
-        String rowFormat = "| %10s | %20s | %20s | %12s |\n";
+        String rowFormat = "| %10s | %24s | %20s | %12s |\n";
         System.out.printf(rowFormat, "ID", "FULL NAME", "JOB TITLE", "TRANSITIONS");
         System.out.println("|" + new String(new char[73]).replace("\0", "=") + "|");
 
