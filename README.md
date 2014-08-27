@@ -4,6 +4,9 @@ Sample Java / Oracle command line app
 This is a simple Java command line application I've done for job interview.
 With the purpose of getting some useful experience from writing it, I over-engineered quite a bit.
 
+Application can be run either from IDE, with `mvn exec:java`, 
+or from fat jar that is built by maven shade plugin and ends up in `target/` directory after `mvn package`.
+
 Application entry point is `Application` class that uses neat argparse4j library to handle command line arguments.
 Functionality is split into separate commands, which are simple classes that implement `ICommand` functional interface.
 argparse4j allows to add ghost parameters with default values, inaccessible to the client from command line,
