@@ -10,6 +10,17 @@ argparse4j allows to add ghost parameters with default values, inaccessible to t
 commands classes are instantiated and registered as such parameters.
 Each command and parameter have help strings that describe their purpose to the user.
 
+Database connection settings are searched for in `ApplicationConfig.properties` file. 
+Default one is in project's resources folder.
+User can override default configuration by placing the file with same name into current working directory.
+`Owner` library is configured to prefer cwd file over resources one.
+Default config is 
+```
+jdbcUrl = jdbc:oracle:thin:@localhost:1521/XE
+jdbcUsername = JOB_TEST_1_HR
+jdbcPassword = JOB_TEST_1_HR
+```
+
 First two commands, `migrate-update` and `migrate-rollback` use Liquibase Java API to either apply or rollback migrations.
 Migrations scripts use raw SQL format and are located in `resources/migrations/`.
 
