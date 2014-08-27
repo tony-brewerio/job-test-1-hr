@@ -110,6 +110,17 @@ public class Application {
                 .help("If reverse is set, display managers top to bottom")
                 .action(Arguments.storeTrue());
 
+        Subparser parserEmployeeSalary = subparsers
+                .addParser("employee-salary")
+                .help("Displays salary for given employees, both in USD and local currency ( KZT )")
+                .setDefault("command", new EmployeeSalary());
+        parserEmployeeSalary
+                .addArgument("id")
+                .help("IDs of the employees")
+                .nargs("+")
+                .type(Integer.class)
+                .required(true);
+
         try {
             Namespace ns = parser.parseArgs(args);
             ICommand command = ns.get("command");
