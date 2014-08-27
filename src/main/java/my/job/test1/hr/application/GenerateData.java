@@ -8,6 +8,7 @@ import org.sql2o.Connection;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Random;
 
 public class GenerateData implements ICommand {
@@ -25,7 +26,7 @@ public class GenerateData implements ICommand {
     Faker faker = new Faker();
 
     long hireDateFrom = Timestamp.valueOf("2010-01-01 00:00:00").getTime();
-    long hireDateTo = Timestamp.valueOf("2012-01-01 00:00:00").getTime();
+    long hireDateTo = Timestamp.valueOf("2011-01-01 00:00:00").getTime();
 
     String[][] regionsWithCountries = {
             {"AMERICA", "America", "Canada"},
@@ -131,11 +132,18 @@ public class GenerateData implements ICommand {
     }
 
     void createEmploymentHistory(int departmentId, int employeeId) throws Exception {
+        Timestamp now = new Timestamp(new Date().getTime());
         int jobsCount = random.nextInt(5) + 1;
-        Timestamp startDate = new Timestamp(hireDateFrom + (long) (Math.random() * (hireDateTo - hireDateFrom)) / 2);
+        long datesDelta = (hireDateTo - hireDateFrom);
+        Timestamp startDate = new Timestamp(hireDateFrom + randomJobDuration() / 2);
         Timestamp endDate;
         for (int i = 0; i < jobsCount; i++) {
-            endDate = new Timestamp(startDate.getTime() + (long) (Math.random() * (hireDateTo - hireDateFrom)));
+            endDate = new Timestamp(startDate.getTime() + randomJobDuration() / 2 + datesDelta / 2);
+            // because jobs have random duration, they can possibly go over current date
+            // generator stops, if next generated job ends after now
+            if (endDate.getTime() >= now.getTime()) {
+                break;
+            }
             int jobI = random.nextInt(10);
             int jobId = jobsIds[jobI];
             employeesDAO.jobStart(
@@ -144,9 +152,11 @@ public class GenerateData implements ICommand {
                     new BigDecimal(10 + 10 * Math.random())
             );
             employeesDAO.jobEnd(employeeId, endDate);
-            startDate = endDate;
+            startDate = new Timestamp(endDate.getTime() + randomJobDuration());
         }
-        if (random.nextBoolean()) {
+        // add current, never ended, job to half of the employees
+        // start date may be after now, no current job is assigned in that case
+        if (random.nextBoolean() && startDate.getTime() < now.getTime()) {
             int jobI = random.nextInt(10);
             int jobId = jobsIds[jobI];
             employeesDAO.jobStart(
@@ -155,6 +165,10 @@ public class GenerateData implements ICommand {
                     new BigDecimal(10 + 10 * Math.random())
             );
         }
+    }
+
+    long randomJobDuration() {
+        return (long) ((hireDateTo - hireDateFrom) * Math.random());
     }
 
 }

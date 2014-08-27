@@ -57,13 +57,30 @@ public class Application {
                 .setDefault("command", new QueryByRegionAndHistorySize());
         parserQueryByRegionAndHistorySize
                 .addArgument("--regions")
+                .help("Employees must work in one of the specified regions")
                 .type(String.class)
                 .nargs("+")
-                .setDefault(new String[] { "AMERICA", "EUROPE" });
+                .setDefault(new String[]{"AMERICA", "EUROPE"});
         parserQueryByRegionAndHistorySize
                 .addArgument("--jobs")
+                .help("Employees must have at least this much job transfers")
                 .type(Integer.class)
                 .setDefault(2);
+
+        Subparser parserQueryDepartmentsStats = subparsers
+                .addParser("query-ds")
+                .help("Queries database for some departments stats, filters departments by staff size")
+                .setDefault("command", new QueryDepartmentsStats());
+        parserQueryDepartmentsStats
+                .addArgument("--staff")
+                .help("Will only show departments that have at least this much staff")
+                .type(Integer.class)
+                .setDefault(3);
+        parserQueryDepartmentsStats
+                .addArgument("--years")
+                .help("Specifies how many years employee must work to be considered veteran")
+                .type(Double.class)
+                .setDefault(3d);
 
         try {
             Namespace ns = parser.parseArgs(args);

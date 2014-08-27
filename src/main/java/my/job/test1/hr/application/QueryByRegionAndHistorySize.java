@@ -1,11 +1,5 @@
 package my.job.test1.hr.application;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
-import my.job.test1.hr.Application;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.commons.io.IOUtils;
 
@@ -23,6 +17,11 @@ public class QueryByRegionAndHistorySize implements ICommand {
         List<String> regions = ns.get("regions");
         int jobs = ns.get("jobs");
 
+        System.out.printf(
+                "Invoking query BY_REGIONS_AND_JOBS with { regions: %s , jobs: %s } \n\n",
+                regions, jobs
+        );
+
         String sql = IOUtils.toString(getClass().getResourceAsStream("/sql/QueryByRegionAndHistorySize.sql"), "UTF-8");
         String inClause = "?";
         for (int i = 1; i < regions.size(); i++) {
@@ -30,8 +29,9 @@ public class QueryByRegionAndHistorySize implements ICommand {
         }
         sql = sql.replace("?regions?", inClause);
 
-        System.out.printf("%10s | %20s | %20s | %12s \n", "ID", "FULL NAME", "JOB TITLE", "TRANSITIONS");
-        System.out.println("_______________________________________________________________________");
+        String rowFormat = "| %10s | %20s | %20s | %12s |\n";
+        System.out.printf(rowFormat, "ID", "FULL NAME", "JOB TITLE", "TRANSITIONS");
+        System.out.println("|" + new String(new char[73]).replace("\0", "=") + "|");
 
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -41,7 +41,7 @@ public class QueryByRegionAndHistorySize implements ICommand {
             statement.setInt(regions.size() + 1, jobs);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                System.out.printf("%10s | %20s | %20s | %12s \n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4));
+                System.out.printf(rowFormat, rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4));
             }
         }
     }
