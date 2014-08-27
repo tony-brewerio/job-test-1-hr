@@ -2,6 +2,7 @@ package my.job.test1.hr;
 
 import my.job.test1.hr.application.*;
 import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.*;
 import org.aeonbits.owner.ConfigCache;
 import org.sql2o.Sql2o;
@@ -81,6 +82,18 @@ public class Application {
                 .help("Specifies how many years employee must work to be considered veteran")
                 .type(Double.class)
                 .setDefault(3d);
+
+        Subparser parserExportEmployees = subparsers
+                .addParser("export-employees")
+                .help("Exports entire list of employees as TSV into specified file")
+                .setDefault("command", new ExportEmployees());
+        parserExportEmployees
+                .addArgument("--header").action(Arguments.storeTrue());
+        parserExportEmployees
+                .addArgument("--file")
+                .help("File that TSV data will be written to.")
+                .type(Arguments.fileType().verifyCanCreate())
+                .required(true);
 
         try {
             Namespace ns = parser.parseArgs(args);
